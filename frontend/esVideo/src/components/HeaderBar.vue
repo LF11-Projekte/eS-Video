@@ -32,8 +32,7 @@ nav {
 
     background-color: #2F2F2F;
 
-    z-index: 1;
-    -webkit-box-shadow: 0px 9px 25px 0px rgba(0,0,0,0.59); 
+    z-index: 1; 
     box-shadow: 0px 9px 15px -5px rgba(0,0,0,0.59);
 }
 

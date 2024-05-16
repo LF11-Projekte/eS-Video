@@ -13,7 +13,7 @@ import HeaderBar from './components/HeaderBar.vue';
 
 </template>
 
-<style scoped>
+<style>
 .app {
   display: grid;
   grid-template-rows: 3em 1fr;
