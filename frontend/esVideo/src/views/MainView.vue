@@ -19,6 +19,24 @@
                 </div>
             </div>
         </div>
+        <div class="content">
+            <ModeDepBox @tabSwitch="updateTab">
+                <template v-slot:content>
+                    <transition mode="out-in">
+                        <div v-if="tabIdx == 0">
+                            <div class="video-list">
+                                <VideoDisplay v-for="i in 10" :key="i"/>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div class="video-list">
+                                <VideoDisplay v-for="i in 2" :key="i"/>
+                            </div>
+                        </div>
+                    </transition>
+                </template>
+            </ModeDepBox>
+        </div>
     </div>
 </template>
 
@@ -26,18 +44,37 @@
 import { defineComponent } from 'vue';
 import ViewCount from '@/components/ViewCount.vue';
 import RatingBar from '@/components/RatingBar.vue';
+import ModeDepBox from '@/components/ModeDepBox.vue';
+import VideoDisplay from '@/components/VideoDisplay.vue';
 
 export default defineComponent({
     name: "MainPage",
     components: {
         ViewCount,
         RatingBar,
+        ModeDepBox,
+        VideoDisplay,
+    },
+    data() {
+        return {
+            tabIdx: 0,
+        }
+    },
+    methods: {
+        updateTab(newIdx) {
+            this.tabIdx = newIdx;
+        }
     }
 })
 </script>
 
 <style scoped>
 .main-page {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    
+    height: 100%;
+
     background-color: #636363;
 }
 
@@ -124,5 +161,20 @@ export default defineComponent({
     margin-top: auto;
     margin-bottom: 0.5em;
     margin-left: 1em;
+}
+
+.content {
+    overflow: hidden;
+}
+
+/* -------------------------------------------------------------------------- */
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

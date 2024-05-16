@@ -14,6 +14,16 @@ import HeaderBar from './components/HeaderBar.vue';
 </template>
 
 <style>
+* {
+  box-sizing: border-box;
+}
+
+main, #app {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
 .app {
   display: grid;
   grid-template-rows: 3em 1fr;
