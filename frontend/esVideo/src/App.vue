@@ -7,7 +7,11 @@ import HeaderBar from './components/HeaderBar.vue';
     <div class="app">
         <HeaderBar/>
         <main>
-          <RouterView />
+          <RouterView v-slot="{ Component }">
+            <transition name="router-fade" mode="out-in">
+              <component :is="Component" :key="$route.fullPath"/>
+            </transition>
+          </RouterView>
         </main>
     </div>
 
@@ -30,5 +34,21 @@ main, #app {
 
   width: 100%;
   height: 100%;
+
+  background-color: #1C1C1C;
+}
+
+.router-fade-enter-active {
+  transition: transform 0.3s ease-out;
+}
+.router-fade-leave-active {
+  transition: transform 0.3s ease-in;
+}
+
+.router-fade-enter-from {
+  transform: translateY(-100vh);
+}
+.router-fade-leave-to {
+  transform: translateY(100vh);
 }
 </style>

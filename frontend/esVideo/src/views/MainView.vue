@@ -20,7 +20,17 @@
             </div>
         </div>
         <div class="content">
-            <ModeDepBox @tabSwitch="updateTab">
+            <ModeDepBox @tabSwitch="updateTab" :Tabs='[
+                {
+                  ID: 0,
+                  Title: "Neuste"
+                },
+                {
+                  ID: 1,
+                  Title: "Folge ich"
+                },
+              ]'
+            >
                 <template v-slot:content>
                     <transition mode="out-in">
                         <div v-if="tabIdx == 0">
@@ -48,7 +58,7 @@ import ModeDepBox from '@/components/ModeDepBox.vue';
 import VideoDisplay from '@/components/VideoDisplay.vue';
 
 export default defineComponent({
-    name: "MainPage",
+    name: "MainView",
     components: {
         ViewCount,
         RatingBar,

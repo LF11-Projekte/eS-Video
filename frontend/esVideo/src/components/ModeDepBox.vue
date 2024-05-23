@@ -19,22 +19,15 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    name: "ModeDepBox",
+  name: "ModeDepBox",
 	data() {
 		return {
 			SelectedIndex: 0,
-			Tabs: [
-				{ 
-					ID: 0,
-					Title: "Neuste"
-				},
-				{ 
-					ID: 1,
-					Title: "Folge ich"
-				},
-			]
 		}
 	},
+  props: [
+      'Tabs'
+  ],
 	methods: {
 		changeTab(idx) {
 			this.SelectedIndex = idx;
@@ -48,6 +41,7 @@ export default defineComponent({
 .outer-container {
 	width: 100%;
 	height: 100%;
+  min-height: 20em;
 
 	padding: 2em;
 }
@@ -58,7 +52,6 @@ export default defineComponent({
 
 	width: 100%;
 	height: 100%;
-	max-height: 100%;
 }
 
 .selector {

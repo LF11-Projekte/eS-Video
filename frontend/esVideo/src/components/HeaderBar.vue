@@ -1,6 +1,8 @@
 <template>
      <nav>
-        <EsLogo/>
+        <router-link to="/home">
+          <EsLogo/>
+        </router-link>
         <div></div>
         <SearchBar/>
         <div></div>

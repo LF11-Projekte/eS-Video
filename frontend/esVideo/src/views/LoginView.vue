@@ -46,6 +46,7 @@ export default defineComponent({
       // Loginanfrage an das Backend
       fetch("http://10.100.0.170/session/login", {
         method: "POST",
+        credentials: "include",
         body: JSON.stringify({
           login: this.loginName,
           password: this.password,
@@ -60,7 +61,6 @@ export default defineComponent({
 
         // Login-Flag setzen
         AppState.StateObj.Usr_LoggedIn = true;
-        AppState.save();
 
         // redirect auf die homepage
         router.push({path: "home"});
@@ -78,6 +78,8 @@ export default defineComponent({
 
   width: 100%;
   height: 100%;
+
+  background: linear-gradient(322deg, rgb(145, 122, 212) 0%, rgba(54,191,167,1) 100%);
 }
 
 .login-popup {
