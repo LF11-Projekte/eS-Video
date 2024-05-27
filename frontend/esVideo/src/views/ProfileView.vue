@@ -1,13 +1,13 @@
 <template>
   <div class="main-page">
     <div class="header">
-        <div class="profile-picture" :style='`background-image: url(${Config.BackendHost}${ProfilePic});`'></div>
+        <div class="profile-picture" :style='`background-image: url(${ProfilePic});`'></div>
         <div class="profile-info">
           <h1>{{Username}}</h1>
           <p>{{Class}}</p>
         </div>
         <div class="follow-button">
-            <button v-if="Number($route.params.uid) != AppState.StateObj.Usr_UID" @click="doFollow()">
+            <button v-if="$route.params.uid != AppState.StateObj.Usr_UID" @click="doFollow()">
             <transition name="fade" mode="out-in">
                 <p v-if="IsFollowing">Entfolgen</p>
                 <p v-else>Folgen</p>
@@ -96,9 +96,9 @@ export default defineComponent({
           if (!res.ok) return;
 
           res.json().then(obj => {
-            this.Username = obj['name'];
-            this.Class = obj['class'];
-            this.ProfilePic = obj['icon'];
+            this.Username = obj['displayName'];
+            this.Class = obj['className'];
+            this.ProfilePic = obj['profilePicture'];
           })
         });
 

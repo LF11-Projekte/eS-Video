@@ -5,14 +5,14 @@
     </div>
     <div v-else class="user-menu" @click="DropDownOpen = !DropDownOpen">
         <p>{{Username}}</p>
-        <div class="profile-picture" :style='`background-image: url(${Config.BackendHost}${ProfilePic});`'></div>
+        <div class="profile-picture" :style='`background-image: url(${ProfilePic});`'></div>
     </div>
   </transition>
     <div class="drop-down" v-if="DropDownOpen">
       <div class="seperator"></div>
       <router-link :key="UID" :to="`/profile/${UID}`" @click="closeDropdown()">Mein Profil</router-link>
       <router-link to="/upload" @click="closeDropdown()">Video Hochladen</router-link>
-      <router-link to="/settings" @click="closeDropdown()">Einstellungen</router-link>
+      <router-link to="/edit-profile" @click="closeDropdown()">Einstellungen</router-link>
       <div class="seperator"></div>
       <button @click="doLogout()">Abmelden</button>
     </div>
@@ -57,8 +57,8 @@ export default defineComponent({
             if (!res.ok) return;
 
             res.json().then(obj => {
-              this.Username = obj['name'];
-              this.ProfilePic = obj['icon'];
+              this.Username = obj['displayName'];
+              this.ProfilePic = obj['profilePicture'];
             })
           })
     },
@@ -73,7 +73,7 @@ export default defineComponent({
         AppState.StateObj.Usr_UID = 0;
 
         // redirect auf die homepage
-        router.push({path: "home"});
+        router.push({path: "/home"});
       });
 
       this.closeDropdown();

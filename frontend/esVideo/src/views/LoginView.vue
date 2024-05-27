@@ -1,17 +1,19 @@
 <template>
   <div class="login-view">
     <div class="login-popup">
-      <h1>Anmelden</h1>
-      <form @submit.prevent="doLogin()">
-        <input type="text" placeholder="Anmeldename" v-model="loginName">
-        <input type="password" placeholder="Kennwort" v-model="password">
-
-        <p class="error" v-if="errorMsg">
-          {{errorMsg}}
-        </p>
-
-        <button>Anmelden</button>
-      </form>
+      <h1>Willkommen</h1>
+      <p>Im eS-Videoportal des <b>BSZET Dresden</b>.</p>
+      <p class="info">Bitte verwenden Sie Ihre Schulanmeldung und Authentifizieren Sie sich via des Schulkonto-Authentifikator.</p>
+      <div class="center">
+        <button @click="doLogin()" v-if="loginWindow == null">
+          <div class="left">
+            SKA
+          </div>
+          <div class="right">
+            Authentifizieren
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -21,50 +23,69 @@ import {defineComponent} from 'vue'
 import {state} from "vue-tsc/out/shared";
 import {AppState} from "@/state";
 import router from "@/router";
+import {Config} from "@/config";
 
 export default defineComponent({
   name: "LoginView",
   data() {
     return {
-      loginName: "",
-      password: "",
-      errorMsg: "",
+      loginWindow: (null as Window|null),
     }
   },
   mounted() {
     // wenn schon angemeldet -> weiterleitung auf /home
     if (AppState.StateObj.Usr_LoggedIn) {
-      router.push({path: "home"});
+      router.push({path: "/home"});
     }
   },
   methods: {
-    doLogin() {
-      // sicherstellen, dass name und pwd nicht leer sind
-      if (!this.loginName) return;
-      if (!this.password) return;
+    async doLogin() {
+      // Es ist bereits ein Login-Fenster geöffnet
+      if (this.loginWindow != null) return;
 
-      // Loginanfrage an das Backend
-      fetch("http://10.100.0.170/session/login", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({
-          login: this.loginName,
-          password: this.password,
+      // Login-Attempt token vom Backend einholen
+      let atp = await new Promise((resolve) => fetch(`${Config.BackendHost}/session/attempt`, {
+        credentials: 'include',
+      }).then(res => {
+        res.json().then(data => {
+          resolve(data['atp']);
         })
-      }).then(value => {
+      }));
 
-        // Fehler bei der Anmeldung
-        if (!value.ok) {
-          this.errorMsg = "Anmeldung fehlgeschlagen";
-          return;
-        }
+      const redirectLink = `${Config.AppHost}/login/${atp}/confirm`;
+      this.loginWindow = window.open(`${Config.SKAHost}/auth/login-form?r=${encodeURIComponent(redirectLink)}`, 'Login', 'width=800,height=600,status=0,toolbar=0');
 
-        // Login-Flag setzen
-        AppState.StateObj.Usr_LoggedIn = true;
+      // Auf Schließen des Fensters warten
+      let timer = setInterval(() => {
+        try {
+          if (this.loginWindow!.closed ?? false) {
+            // Timer stoppen und Fenster für möglichen nächsten Aufruf löschen
+            clearInterval(timer);
+            this.loginWindow = null;
 
-        // redirect auf die homepage
-        router.push({path: "home"});
+            // Login prüfen
+            this.confirmLogin();
+          }
+        } catch {
+        } // idc
+      }, 1000);
+    },
+    confirmLogin() {
+      // Existiert jetzt eine Sitzung?
+      fetch(`${Config.BackendHost}/session/whoami`, {
+        credentials: "include"
       })
+          .then(res => {
+            if (!res.ok) return; // backend ist nicht erreichbar
+
+            res.json().then(data => {
+              if (data['loggedIn']) {
+                // Wenn ja -> Sitzung laden und Redirect zu /home
+                AppState.init();
+                this.$router.push({path: "/home"});
+              }
+            });
+          })
     }
   }
 })
@@ -96,36 +117,49 @@ export default defineComponent({
   text-align: center;
 }
 
-.login-popup form {
+.login-popup p {
+  width: 100%;
+  text-align: center;
+}
+
+.login-popup .info {
+  opacity: 0.4;
+}
+
+.login-popup .center {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  width: 100%;
 }
 
-.login-popup form input {
-  margin: 0.5em 1em;
-  padding: 0.5em;
+.login-popup button {
+  display: grid;
+  grid-template-columns: auto 1fr;
 
-  color: white;
-  background: #535353;
-
-  border: none;
-  border-radius: 0.2em;
-  outline: none;
-
-  text-align: center;
-}
-
-.login-popup form button {
   margin: 1em;
-  padding: 0.5em;
+  padding: 0;
 
   color: white;
-  background: #4390a8;
+  background: transparent;
 
   border: none;
-  border-radius: 0.2em;
+  cursor: pointer;
+}
 
-  text-align: center;
+.login-popup div {
+  padding: 0.5em;
+}
+
+.login-popup button .left {
+  font-weight: 900;
+  background-color: #1D7895;
+
+  border-radius: 0.2em 0 0 0.2em;
+}
+
+.login-popup button .right {
+  background: #4390a8;
+  border-radius: 0 0.2em 0.2em 0;
 }
 
 .error {
