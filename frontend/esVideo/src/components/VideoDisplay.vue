@@ -1,31 +1,60 @@
 <template>
-	<div class="frame">
+	<div class="frame" @click="watch()">
 		<div class="left">
-			<div class="thumbnail"></div>
+			<div class="thumbnail" :style="`background-image: url(${Config.BackendHost}${video.thumbnail});`"></div>
 		</div>
 		<div class="right">
-			<p class="title">Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test </p>
-			<p class="author">Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor Autor </p>
+			<p class="title">{{video.title}}</p>
+			<router-link :to="{path: `/profile/${video.owner}`}" class="author">{{Owner}}</router-link>
 
 			<div class="info-bar">
-				<ViewCount/>
-				<RatingBar/>
+				<ViewCount :views="video.views"/>
+				<RatingBar :rating="video.rating"/>
 			</div>
 		</div>
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import ViewCount from '@/components/ViewCount.vue';
 import RatingBar from '@/components/RatingBar.vue';
+import {Config} from "@/config";
 
 export default defineComponent({
-    name: "VideoDisplay",
+  name: "VideoDisplay",
+  computed: {
+    Config() {
+      return Config
+    }
+  },
 	components: {
 		ViewCount,
 		RatingBar,
-	}
+	},
+  props: ['video'],
+  data() {
+    return {
+      Owner: "",
+    }
+  },
+  mounted() {
+    fetch(`${Config.BackendHost}/user/${this.video.owner}`, {
+      credentials: "include"
+    })
+    .then(res => {
+      if (!res.ok) return;
+
+      res.json().then(obj => {
+        this.Owner = obj['displayName'];
+      })
+    });
+  },
+  methods: {
+    watch() {
+      this.$router.push({path: `/video/${this.video.key}`});
+    }
+  }
 })
 </script>
 
@@ -45,11 +74,14 @@ export default defineComponent({
 		background: #505050;
 	}
 
-	.left {
+	.left .thumbnail {
 		aspect-ratio: 16/9;
 		width: 13em;
 
 		background: #636363;
+
+    background-position: center;
+    background-size: cover;
 	}
 
 	.right {
@@ -84,6 +116,10 @@ export default defineComponent({
 
 		text-align: left;
 		font-size: 1.1em;
+    text-decoration: none;
+
+    color: rgba(255, 255, 255, 0.70);
+
 	}
 
 	.info-bar {

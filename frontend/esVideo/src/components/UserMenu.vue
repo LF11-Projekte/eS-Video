@@ -3,9 +3,9 @@
     <div v-if="!LoggedIn">
       <router-link to="/login" class="login-lnk">Anmelden</router-link>
     </div>
-    <div v-else class="user-menu" @click="DropDownOpen = !DropDownOpen">
+    <div v-else class="user-menu" @click="toggleDropdown()">
         <p>{{Username}}</p>
-        <div class="profile-picture" :style='`background-image: url(${ProfilePic});`'></div>
+          <div class="profile-picture" :style='`background-image: url(${ProfilePic});`'></div>
     </div>
   </transition>
     <div class="drop-down" v-if="DropDownOpen">
@@ -33,6 +33,7 @@ export default defineComponent({
     return {
       Username: "",
       ProfilePic: "",
+      LastFetch: new Date(),
 
       DropDownOpen: false,
     }
@@ -50,6 +51,7 @@ export default defineComponent({
   },
   methods: {
     fetchUserdata() {
+      this.LastFetch = new Date();
       fetch(`${Config.BackendHost}/user`, {
         credentials: "include"
       })
@@ -70,20 +72,26 @@ export default defineComponent({
       }).then(value => {
         // Login-Flag setzen
         AppState.StateObj.Usr_LoggedIn = false;
-        AppState.StateObj.Usr_UID = 0;
+        AppState.StateObj.Usr_UID = "";
 
         // redirect auf die homepage
-        router.push({path: "/home"});
+        router.push({path: "/login"});
       });
 
       this.closeDropdown();
+    },
+    toggleDropdown() {
+      this.DropDownOpen = !this.DropDownOpen;
+      if (this.DropDownOpen && (new Date().getTime() - this.LastFetch.getTime()) >= 5000) {
+        this.fetchUserdata();
+      }
     },
     closeDropdown() {
       this.DropDownOpen = false;
     },
   },
   watch: {
-    'AppState.StateObj.Usr_UID'() {
+    UID() {
       this.fetchUserdata();
     }
   }

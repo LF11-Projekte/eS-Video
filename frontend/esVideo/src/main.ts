@@ -6,7 +6,7 @@ import router from './router'
 import {AppState} from "@/state";
 
 // Sitzung wiederherstellen
-AppState.init();
+await AppState.init();
 
 const app = createApp(App)
 app.use(router)

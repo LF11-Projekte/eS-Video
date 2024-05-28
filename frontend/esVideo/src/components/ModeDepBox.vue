@@ -42,8 +42,6 @@ export default defineComponent({
 	width: 100%;
 	height: 100%;
   min-height: 20em;
-
-	padding: 2em;
 }
 
 .inner-container {

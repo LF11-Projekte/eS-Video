@@ -31,7 +31,6 @@
 import { defineComponent } from 'vue';
 import {Config} from "@/config";
 import {AppState} from "@/state";
-import * as events from "node:events";
 
 export default defineComponent({
   name: "EditProfileView",
@@ -57,21 +56,24 @@ export default defineComponent({
     }
   },
   mounted() {
-    fetch(`${Config.BackendHost}/user`, {
-      credentials: "include"
-    })
-        .then(res => {
-          if (!res.ok) return;
-
-          res.json().then(obj => {
-            this.Username = obj['displayName'];
-            this.Description = obj['description'];
-            this.Class = obj['className'];
-            this.ProfilePic = obj['profilePicture'];
-          })
-        });
+    this.fetchUserInfo();
   },
   methods: {
+    fetchUserInfo() {
+      fetch(`${Config.BackendHost}/user`, {
+        credentials: "include"
+      })
+          .then(res => {
+            if (!res.ok) return;
+
+            res.json().then(obj => {
+              this.Username = obj['displayName'];
+              this.Description = obj['description'];
+              this.Class = obj['className'];
+              this.ProfilePic = obj['profilePicture'];
+            })
+          });
+    },
     updateUsername() {
       fetch(`${Config.BackendHost}/user/displayname`, {
         method: 'PUT',
@@ -80,7 +82,9 @@ export default defineComponent({
           'displayName': this.Username,
         })
       })
-          .then(value => console.log('saved'))
+      .then(value => {
+        this.fetchUserInfo();
+      })
     },
     updateDescription() {
       fetch(`${Config.BackendHost}/user/description`, {
@@ -90,7 +94,9 @@ export default defineComponent({
           'description': this.Description,
         })
       })
-          .then(value => console.log('saved'))
+      .then(value => {
+        this.fetchUserInfo();
+      })
     },
     uploadImage(e: Event) {
       let data = new FormData();
@@ -102,7 +108,10 @@ export default defineComponent({
         credentials: "include",
         body: data,
       })
-          .then(value => console.log('saved'))
+      .then(value => {
+        this.fetchUserInfo();
+        e.target!.value = '';
+      })
     }
   }
 })
@@ -183,6 +192,7 @@ export default defineComponent({
 
 .popup {
   margin-top: 2em;
+  margin-bottom: 2em;
 
   width: 50em;
   height: fit-content;

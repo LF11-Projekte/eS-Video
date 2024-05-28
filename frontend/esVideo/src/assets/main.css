@@ -9,3 +9,7 @@ html, body {
 
   font-family: Actor;
 }
+
+.pad {
+  padding: 2em;
+}

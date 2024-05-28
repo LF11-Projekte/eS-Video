@@ -12,17 +12,17 @@ export const AppState = reactive({
         // User state
         // ----------
         Usr_LoggedIn: false,
-        Usr_UID: 0,
+        Usr_UID: "",
     }),
 
-    init() {
-        fetch(`${Config.BackendHost}/session/whoami`, {
+    async init() {
+        await fetch(`${Config.BackendHost}/session/whoami`, {
             credentials: "include"
         })
-            .then(res => {
+            .then(async res => {
                 if (!res.ok) return; // backend ist nicht erreichbar
 
-                res.json().then(data => {
+                await res.json().then(data => {
                     this.StateObj.Usr_LoggedIn = data['loggedIn'];
                     if (data['loggedIn']) {
                         this.StateObj.Usr_UID = data['uid'];

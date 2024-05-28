@@ -1,8 +1,17 @@
 <template>
     <div class="bar">
-        <div class="bar-filling"></div>
+        <div class="bar-filling" :style="`width: ${rating*100}%;`"></div>
     </div>
 </template>
+
+<script lang="ts">
+import {defineComponent} from "vue";
+
+export default defineComponent({
+  name: "RatingBar",
+  props: ['rating']
+});
+</script>
 
 <style scoped>
     .bar {
@@ -13,7 +22,6 @@
     }
 
     .bar-filling {
-        width: 50%;
         height: 100%;
 
         background-color: #18B21E;

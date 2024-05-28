@@ -1,27 +1,39 @@
 <template>
   <div class="main-page">
     <div class="header">
-        <div class="profile-picture" :style='`background-image: url(${ProfilePic});`'></div>
-        <div class="profile-info">
-          <h1>{{Username}}</h1>
-          <p>{{Class}}</p>
+        <div class="main">
+          <div class="profile-picture" :style='`background-image: url(${ProfilePic});`'></div>
+          <div class="profile-info">
+            <h1>{{Username}}</h1>
+            <p>{{Class}} <span class="desc-switch" @click="IsShowingDescription = !IsShowingDescription">
+              <transition name="fade" mode="out-in">
+                <span v-if="!IsShowingDescription">+</span>
+                <span v-else>-</span>
+              </transition>
+            </span></p>
+          </div>
+          <div class="follow-button">
+              <button v-if="$route.params.uid != AppState.StateObj.Usr_UID" @click="doFollow()">
+              <transition name="fade" mode="out-in">
+                  <p v-if="IsFollowing">Entfolgen</p>
+                  <p v-else>Folgen</p>
+              </transition>
+                <p>{{Followers}}</p>
+              </button>
+              <div v-else>
+                <p>{{Followers}}</p>
+                <p>Follower</p>
+              </div>
+          </div>
         </div>
-        <div class="follow-button">
-            <button v-if="$route.params.uid != AppState.StateObj.Usr_UID" @click="doFollow()">
-            <transition name="fade" mode="out-in">
-                <p v-if="IsFollowing">Entfolgen</p>
-                <p v-else>Folgen</p>
-            </transition>
-              <p>{{Followers}}</p>
-            </button>
-            <div v-else>
-              <p>{{Followers}}</p>
-              <p>Follower</p>
-            </div>
-        </div>
+        <transition name="open" mode="out-in">
+          <div class="desc" v-if="IsShowingDescription">
+            {{Description}}
+          </div>
+        </transition>
     </div>
     <div class="content">
-      <ModeDepBox @tabSwitch="updateTab" :Tabs='[
+      <ModeDepBox class="pad" @tabSwitch="updateTab" :Tabs='[
                 {
                   ID: 0,
                   Title: "Neuste"
@@ -40,12 +52,7 @@
           <transition mode="out-in">
             <div v-if="tabIdx == 0">
               <div class="video-list">
-                <VideoDisplay v-for="i in 10" :key="i"/>
-              </div>
-            </div>
-            <div v-else>
-              <div class="video-list">
-                <VideoDisplay v-for="i in 2" :key="i"/>
+                <VideoList mode="usr" :user="$route.params.uid"/>
               </div>
             </div>
           </transition>
@@ -61,6 +68,7 @@ import ModeDepBox from '@/components/ModeDepBox.vue';
 import VideoDisplay from '@/components/VideoDisplay.vue';
 import {Config} from "@/config";
 import {AppState} from "@/state";
+import VideoList from "@/components/VideoList.vue";
 
 export default defineComponent({
   name: "ProfileView",
@@ -73,17 +81,21 @@ export default defineComponent({
     }
   },
   components: {
+    VideoList,
     ModeDepBox,
     VideoDisplay,
   },
   data() {
     return {
       Username: "",
+      Description: "",
       Class: "",
       ProfilePic: "",
 
       Followers: 0,
       IsFollowing: false,
+
+      IsShowingDescription: false,
 
       tabIdx: 0,
     }
@@ -96,9 +108,10 @@ export default defineComponent({
           if (!res.ok) return;
 
           res.json().then(obj => {
-            this.Username = obj['displayName'];
-            this.Class = obj['className'];
-            this.ProfilePic = obj['profilePicture'];
+            this.Username    = obj['displayName'];
+            this.Description = obj['description'];
+            this.Class       = obj['className'];
+            this.ProfilePic  = obj['profilePicture'];
           })
         });
 
@@ -162,12 +175,9 @@ export default defineComponent({
 }
 
 .header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
   width: 100%;
-  height: 20em;
+  padding-top: 4em;
+  padding-bottom: 4em;
 
   color: white;
   font-family: Inter;
@@ -178,12 +188,42 @@ export default defineComponent({
   background: linear-gradient(322deg, rgb(122, 148, 212) 0%, rgb(191, 54, 75) 100%);
 }
 
-.header {
+.header .main {
   display: flex;
   flex-direction: row;
   align-items: center;
 
   padding-left: 2em;
+}
+
+.header .desc-switch {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 1.3em;
+  height: 1.3em;
+
+  padding-right: 1px;
+  padding-bottom: 2px;
+
+  border-radius: 100%;
+  background: rgba(255, 255, 255, 0.26);
+
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.header .desc {
+  margin-left: 14em;
+  margin-right: 10em;
+
+  padding: 1em;
+
+  background: rgba(0, 0, 0, 0.2);
+  text-align: left;
+
+  white-space: pre;
 }
 
 .profile-picture {
@@ -302,5 +342,17 @@ export default defineComponent({
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+.open-enter-active,
+.open-leave-active {
+  transition: transform 0.1s ease;
+  transform-origin: top;
+}
+
+.open-enter-from,
+.open-leave-to {
+  transform: scaleY(0);
 }
 </style>

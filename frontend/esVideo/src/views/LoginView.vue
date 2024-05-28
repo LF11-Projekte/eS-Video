@@ -32,12 +32,6 @@ export default defineComponent({
       loginWindow: (null as Window|null),
     }
   },
-  mounted() {
-    // wenn schon angemeldet -> weiterleitung auf /home
-    if (AppState.StateObj.Usr_LoggedIn) {
-      router.push({path: "/home"});
-    }
-  },
   methods: {
     async doLogin() {
       // Es ist bereits ein Login-Fenster geöffnet
@@ -78,10 +72,10 @@ export default defineComponent({
           .then(res => {
             if (!res.ok) return; // backend ist nicht erreichbar
 
-            res.json().then(data => {
+            res.json().then(async data => {
               if (data['loggedIn']) {
                 // Wenn ja -> Sitzung laden und Redirect zu /home
-                AppState.init();
+                await AppState.init();
                 this.$router.push({path: "/home"});
               }
             });

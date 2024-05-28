@@ -1,9 +1,18 @@
 <template>
     <div>
         <img src="@/assets/img/eye.png" alt="">
-        <p>112</p>
+        <p>{{views}}</p>
     </div>
 </template>
+
+<script lang="ts">
+import {defineComponent} from "vue";
+
+export default defineComponent({
+  name: "ViewCount",
+  props: ['views']
+});
+</script>
 
 <style scoped>
 img {

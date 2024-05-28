@@ -4,23 +4,23 @@
             <h1>Willkommen!</h1>
             <p>Im eS-Videoportal des <strong>BSZET Dresden</strong></p>
 
-            <div class="top-video">
-                <div class="left">
-                    <div class="thumbnail"></div>
-                </div>
-                <div class="right">
-                    <p class="title">Wir Möchten Wir Möchten Wir Möchten Wir Möchten</p>
-                    <p class="author">Ewan Schlesinger</p>
+<!--            <div class="top-video">-->
+<!--                <div class="left">-->
+<!--                    <div class="thumbnail"></div>-->
+<!--                </div>-->
+<!--                <div class="right">-->
+<!--                    <p class="title">Wir Möchten Wir Möchten Wir Möchten Wir Möchten</p>-->
+<!--                    <p class="author">Ewan Schlesinger</p>-->
 
-                    <div class="info-bar">
-                        <ViewCount/>
-                        <RatingBar/>
-                    </div>
-                </div>
-            </div>
+<!--                    <div class="info-bar">-->
+<!--                        <ViewCount/>-->
+<!--                        <RatingBar/>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
         <div class="content">
-            <ModeDepBox @tabSwitch="updateTab" :Tabs='[
+            <ModeDepBox class="pad" @tabSwitch="updateTab" :Tabs='[
                 {
                   ID: 0,
                   Title: "Neuste"
@@ -34,14 +34,10 @@
                 <template v-slot:content>
                     <transition mode="out-in">
                         <div v-if="tabIdx == 0">
-                            <div class="video-list">
-                                <VideoDisplay v-for="i in 10" :key="i"/>
-                            </div>
+                            <VideoList mode="all"/>
                         </div>
                         <div v-else>
-                            <div class="video-list">
-                                <VideoDisplay v-for="i in 2" :key="i"/>
-                            </div>
+                          <VideoList mode="flw"/>
                         </div>
                     </transition>
                 </template>
@@ -52,16 +48,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import ViewCount from '@/components/ViewCount.vue';
-import RatingBar from '@/components/RatingBar.vue';
 import ModeDepBox from '@/components/ModeDepBox.vue';
 import VideoDisplay from '@/components/VideoDisplay.vue';
+import VideoList from "@/components/VideoList.vue";
 
 export default defineComponent({
     name: "MainView",
     components: {
-        ViewCount,
-        RatingBar,
+      VideoList,
         ModeDepBox,
         VideoDisplay,
     },
@@ -84,26 +78,25 @@ export default defineComponent({
     grid-template-rows: auto 1fr;
     
     height: 100%;
-
-    background-color: #636363;
 }
 
 .header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-    width: 100%;
-    height: 20em;
+  width: 100%;
+  height: 15em;
 
-    color: white;
-    font-family: Inter;
+  color: white;
+  font-family: Inter;
 
-    text-align: center;
-    overflow: auto;
-    
-    background: rgb(135,212,122);
-    background: linear-gradient(322deg, rgba(135,212,122,1) 0%, rgba(54,191,167,1) 100%); 
+  text-align: center;
+  overflow: auto;
+
+  background: rgb(135,212,122);
+  background: linear-gradient(322deg, rgba(135,212,122,1) 0%, rgba(54,191,167,1) 100%);
 }
 
 .header > h1 {
@@ -113,31 +106,6 @@ export default defineComponent({
 .header > p {
     margin-top: 0.5em;
     font-size: 1.5em;
-}
-
-.top-video {
-    width: 40em;
-
-    display: grid;
-    grid-template-columns: 13em 1fr;
-
-    background-color: #ffffff53;
-
-    margin-top: 0.5em;
-    padding: 0.5em;
-}
-
-.thumbnail {
-    width: 13em;
-    aspect-ratio: 16/9;
-    background: white;
-}
-
-.right {
-    display: flex;
-    flex-direction: column;
-
-    overflow-x: hidden;
 }
 
 .right .title {
@@ -174,7 +142,7 @@ export default defineComponent({
 }
 
 .content {
-    overflow: hidden;
+  max-height: 100vh;
 }
 
 /* -------------------------------------------------------------------------- */

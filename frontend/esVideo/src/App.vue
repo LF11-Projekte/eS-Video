@@ -9,7 +9,7 @@ import HeaderBar from './components/HeaderBar.vue';
         <main>
           <RouterView v-slot="{ Component }">
             <transition name="router-fade" mode="out-in">
-              <component :is="Component" :key="$route.fullPath"/>
+                <component :is="Component" :key="$route.fullPath" class="background"/>
             </transition>
           </RouterView>
         </main>
@@ -22,10 +22,16 @@ import HeaderBar from './components/HeaderBar.vue';
   box-sizing: border-box;
 }
 
-main, #app {
+main {
   height: 100%;
-  max-height: 100%;
-  overflow: hidden;
+}
+
+.background {
+  background-color: #636363;
+}
+
+#app {
+  height: 100%;
 }
 
 .app {
