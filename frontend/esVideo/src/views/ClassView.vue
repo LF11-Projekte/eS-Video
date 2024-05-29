@@ -1,49 +1,28 @@
 <template>
   <div class="main-page">
     <div class="header">
-        <div class="main">
-          <div class="profile-picture" :style='`background-image: url(${ProfilePic});`'></div>
-          <div class="profile-info">
-            <h1>{{Username}}</h1>
-            <p><router-link :to="`/class/${ClassId}`">{{Class}}</router-link> <span class="desc-switch" @click="IsShowingDescription = !IsShowingDescription">
-              <transition name="fade" mode="out-in">
-                <span v-if="!IsShowingDescription">+</span>
-                <span v-else>-</span>
-              </transition>
-            </span></p>
-          </div>
-          <div class="follow-button">
-              <button v-if="$route.params.uid != AppState.StateObj.Usr_UID" @click="doFollow()">
-              <transition name="fade" mode="out-in">
-                  <p v-if="IsFollowing">Entfolgen</p>
-                  <p v-else>Folgen</p>
-              </transition>
-                <p>{{Followers}}</p>
-              </button>
-              <div v-else>
-                <p>{{Followers}}</p>
-                <p>Follower</p>
-              </div>
-          </div>
+      <div class="main">
+        <div class="profile-info">
+          <h1>{{Class}}</h1>
         </div>
-        <transition name="open" mode="out-in">
-          <div class="desc" v-if="IsShowingDescription">
-            {{Description}}
-          </div>
-        </transition>
+      </div>
     </div>
     <div class="content">
       <ModeDepBox class="pad" @tabSwitch="updateTab" :Tabs='[
                 {
                   ID: 0,
-                  Title: "Neuste"
+                  Title: "Mitglieder"
                 },
                 {
                   ID: 1,
-                  Title: "Meistgeklickt"
+                  Title: "Neuste"
                 },
                 {
                   ID: 2,
+                  Title: "Meistgeklickt"
+                },
+                {
+                  ID: 3,
                   Title: "Bestbewertet"
                 },
               ]'
@@ -51,18 +30,21 @@
         <template v-slot:content>
           <transition name="fade" mode="out-in">
             <div v-if="tabIdx == 0">
-              <div class="video-list">
-                <VideoList mode="usr" :user="$route.params.uid" sort="newest"/>
-              </div>
+              <MemberGrid :class="$route.params.cid" />
             </div>
             <div v-else-if="tabIdx == 1">
               <div class="video-list">
-                <VideoList mode="usr" :user="$route.params.uid" sort="views"/>
+                <VideoList mode="cls" :class="$route.params.cid" sort="newest"/>
+              </div>
+            </div>
+            <div v-else-if="tabIdx == 2">
+              <div class="video-list">
+                <VideoList mode="cls" :class="$route.params.cid"  sort="views"/>
               </div>
             </div>
             <div v-else>
               <div class="video-list">
-                <VideoList mode="usr" :user="$route.params.uid" sort="rating"/>
+                <VideoList mode="cls" :class="$route.params.cid"  sort="rating"/>
               </div>
             </div>
           </transition>
@@ -74,14 +56,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import ModeDepBox from '@/components/ModeDepBox.vue';
-import VideoDisplay from '@/components/VideoDisplay.vue';
 import {Config} from "@/config";
 import {AppState} from "@/state";
+import ModeDepBox from "@/components/ModeDepBox.vue";
 import VideoList from "@/components/VideoList.vue";
+import FollowTiles from "@/components/FollowTiles.vue";
+import MemberGrid from "@/components/MemberGrid.vue";
 
 export default defineComponent({
-  name: "ProfileView",
+  name: "ClassView",
+  components: {MemberGrid, FollowTiles, VideoList, ModeDepBox},
   computed: {
     AppState() {
       return AppState
@@ -90,87 +74,28 @@ export default defineComponent({
       return Config
     }
   },
-  components: {
-    VideoList,
-    ModeDepBox,
-    VideoDisplay,
-  },
   data() {
     return {
-      Username: "",
-      Description: "",
       Class: "",
-      ClassId: "",
-      ProfilePic: "",
-
-      Followers: 0,
-      IsFollowing: false,
-
-      IsShowingDescription: false,
 
       tabIdx: 0,
     }
   },
   mounted() {
-    fetch(`${Config.BackendHost}/user/${this.$route.params.uid}`, {
+    fetch(`${Config.BackendHost}/class/${this.$route.params.cid}`, {
       credentials: "include"
     })
         .then(res => {
           if (!res.ok) return;
 
           res.json().then(obj => {
-            this.Username    = obj['displayName'];
-            this.Description = obj['description'];
-            this.ClassId     = obj['class'];
-            this.Class       = obj['className'];
-            this.ProfilePic  = obj['profilePicture'];
+            this.Class = obj['name'];
           })
         });
-
-    this.fetchFollowers();
   },
   methods: {
     updateTab(newIdx: number) {
       this.tabIdx = newIdx;
-    },
-    fetchFollowers() {
-      fetch(`${Config.BackendHost}/followers/${this.$route.params.uid}`, {
-        credentials: "include"
-      })
-          .then(res => {
-            if (!res.ok) return;
-
-            res.json().then(obj => {
-              this.Followers = obj['NumFollowers'];
-              this.IsFollowing = obj['IsFollowing'];
-            })
-          })
-    },
-    doFollow() {
-      if (!this.IsFollowing) {
-        // Folgen
-        fetch(`${Config.BackendHost}/follow/${this.$route.params.uid}`, {
-          credentials: "include",
-          method: "post"
-        })
-            .then(res => {
-              if (!res.ok) return;
-
-              this.fetchFollowers();
-            })
-      }
-      else {
-        // Entfolgen
-        fetch(`${Config.BackendHost}/unfollow/${this.$route.params.uid}`, {
-          credentials: "include",
-          method: "post"
-        })
-            .then(res => {
-              if (!res.ok) return;
-
-              this.fetchFollowers();
-            })
-      }
     }
   }
 })
@@ -197,7 +122,7 @@ export default defineComponent({
   text-align: center;
   overflow: auto;
 
-  background: linear-gradient(322deg, rgb(122, 148, 212) 0%, rgb(191, 54, 75) 100%);
+  background: linear-gradient(322deg, rgb(212, 143, 122) 0%, rgb(191, 54, 54) 100%);
 }
 
 .header .main {
@@ -343,11 +268,6 @@ export default defineComponent({
 
 .content {
   overflow: hidden;
-}
-
-a {
-  color: white;
-  text-decoration: none;
 }
 
 

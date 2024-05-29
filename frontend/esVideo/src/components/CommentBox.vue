@@ -6,7 +6,7 @@
       <div class="submit" @click="comment();">+</div>
     </div>
     <div v-if="Comments.length > 0">
-      <CommentInstance v-for="com in Comments" :key="com" :comment="com"/>
+      <CommentInstance v-for="com in Comments" :key="com" :comment="com" :video="video" @refresh="fetchComments()"/>
     </div>
     <div v-else class="no-comments">
       Keine Kommentare

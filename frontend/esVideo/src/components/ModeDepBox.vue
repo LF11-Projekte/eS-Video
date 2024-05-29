@@ -2,7 +2,7 @@
   <div class="outer-container">
 	<div class="inner-container">
 		<div class="selector">
-			<button class="tab" v-for="tab in Tabs" :class="{ active: tab.ID == SelectedIndex }" @click="changeTab(tab.ID)">
+			<button class="tab" v-for="tab in Tabs" :class="{ active: tab.ID == SelectedIndex }" @click="changeTab(tab.ID)" :key="tab">
 				<p>{{tab.Title}}</p>
 			</button>
 		</div>
@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -29,12 +29,12 @@ export default defineComponent({
       'Tabs'
   ],
 	methods: {
-		changeTab(idx) {
+		changeTab(idx: number) {
 			this.SelectedIndex = idx;
 			this.$emit("tabSwitch", idx)
 		}
 	}
-})
+});
 </script>
 
 <style scoped>

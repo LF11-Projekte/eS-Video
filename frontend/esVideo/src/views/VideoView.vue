@@ -1,5 +1,8 @@
 <template>
-  <div class="layout">
+  <div v-if="!Found">
+    <h1 class="not-found">Das gewünschte Video konnte nicht abgerufen werden!</h1>
+  </div>
+  <div v-else class="layout">
     <div class="head">
       <div class="title">
         <h1>{{Title}}</h1>
@@ -27,10 +30,10 @@
         <template v-slot:content>
           <transition mode="out-in">
             <div v-if="tabIdx == 0">
-              <VideoList mode="all"/>
+              <VideoList mode="usr" :user="Owner" sort="newest"/>
             </div>
             <div v-else>
-              <VideoList mode="flw"/>
+              <VideoList mode="all" sort="newest"/>
             </div>
           </transition>
         </template>
@@ -40,7 +43,13 @@
 
         <div class="description">
           <h1>Über dieses Video</h1>
-          <p>{{Description}}</p>
+          <div class="control-center" v-if="Owner == AppState.StateObj.Usr_UID">
+            <p class="edit">Bearbeiten</p>
+            <p class="delete" @click="deleteVideo()">Löschen</p>
+          </div>
+          <div class="description-container">
+            <p>{{Description}}</p>
+          </div>
         </div>
 
         <CommentBox :video="$route.params.key"/>
@@ -53,15 +62,19 @@
 import {defineComponent} from "vue";
 import RatingControl from "@/components/RatingControl.vue";
 import UserDisplay from "@/components/UserDisplay.vue";
-import CommentBox from "@/components/CommentBox.vue";
 import ModeDepBox from "@/components/ModeDepBox.vue";
+import CommentBox from "@/components/CommentBox.vue";
 import VideoList from "@/components/VideoList.vue";
 import ViewCount from "@/components/ViewCount.vue";
 import {Config} from "@/config";
+import {AppState} from "@/state";
 
 export default defineComponent({
   name: "VideoView",
   computed: {
+    AppState() {
+      return AppState
+    },
     Config() {
       return Config
     }
@@ -75,6 +88,7 @@ export default defineComponent({
       Views: 0,
 
       Owner: "",
+      Found: true,
 
       tabIdx: 0,
     }
@@ -84,6 +98,7 @@ export default defineComponent({
       credentials: "include"
     })
     .then(res => res.json())
+        .catch(err => {this.Found = false; })
     .then((value: any) => {
       console.log(value);
        this.Title       = value.title;
@@ -96,12 +111,29 @@ export default defineComponent({
   methods: {
     updateTab(newIdx) {
       this.tabIdx = newIdx;
+    },
+    deleteVideo() {
+      fetch(`${Config.BackendHost}/video/${this.$route.params.key}`, {
+        method: 'DELETE',
+        credentials: "include"
+      })
+      .then(value => {
+        window.location.reload();
+      })
     }
   }
 });
 </script>
 
 <style scoped>
+.not-found {
+  padding: 1em;
+  text-align: center;
+
+  color: white;
+  background: #831b1b;
+}
+
 .layout {
   display: flex;
   flex-direction: column;
@@ -160,22 +192,58 @@ export default defineComponent({
 
 .description {
   margin-top: 1em;
-  padding: 1em;
+
+  overflow: auto;
 
   color: white;
   background: #2F2F2F;
 }
 
 .description h1 {
-  margin: 0;
+  margin: 1em;
   font-size: 1.3em;
 }
 
 .description p {
-  margin: 0;
+  margin: 1em;
   margin-top: 0.5em;
   font-size: 1.3em;
 
   white-space: pre;
+}
+
+.control-center {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+
+  padding: 1em;
+  background: #1F1F1F;
+}
+
+.control-center p {
+  width: 100%;
+  margin: 0;
+
+  text-align: center;
+
+  cursor: pointer;
+}
+
+.control-center p:hover {
+  text-decoration: underline;
+}
+
+.control-center .edit {
+  color: #4da0dd;
+}
+
+.control-center .delete {
+  color: #f15858;
+}
+
+.description-container {
+  width: 100%;
+  overflow-x: scroll;
 }
 </style>

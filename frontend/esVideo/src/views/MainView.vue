@@ -34,10 +34,13 @@
                 <template v-slot:content>
                     <transition mode="out-in">
                         <div v-if="tabIdx == 0">
-                            <VideoList mode="all"/>
+                            <VideoList mode="all" sort="newest"/>
                         </div>
                         <div v-else>
-                          <VideoList mode="flw"/>
+                          <h3>Gefolgte Nutzer</h3>
+                          <FollowTiles/>
+                          <h3>Videos</h3>
+                          <VideoList mode="flw" sort="newest"/>
                         </div>
                     </transition>
                 </template>
@@ -49,15 +52,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import ModeDepBox from '@/components/ModeDepBox.vue';
-import VideoDisplay from '@/components/VideoDisplay.vue';
 import VideoList from "@/components/VideoList.vue";
+import UserTile from "@/components/UserTile.vue";
+import FollowTiles from "@/components/FollowTiles.vue";
 
 export default defineComponent({
     name: "MainView",
     components: {
+      FollowTiles,
+      UserTile,
       VideoList,
         ModeDepBox,
-        VideoDisplay,
     },
     data() {
         return {
@@ -144,7 +149,6 @@ export default defineComponent({
 .content {
   max-height: 100vh;
 }
-
 /* -------------------------------------------------------------------------- */
 .v-enter-active,
 .v-leave-active {

@@ -1,9 +1,23 @@
 <template>
-    <input type="text" placeholder="Suche">
+    <input type="text" placeholder="Suche" v-model="Query" @change="search()">
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 
+export default defineComponent({
+  name: 'SearchBar',
+  data() {
+    return {
+      Query: ""
+    }
+  },
+  methods: {
+    search() {
+      this.$router.push({path: `/search/${encodeURI(this.Query)}`});
+    }
+  }
+})
 </script>
 
 <style scoped>

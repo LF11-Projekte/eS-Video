@@ -1,8 +1,11 @@
 <template>
-  <div class="user-display">
+  <div class="comment-display">
     <div class="profile-pic" :style='`background-image: url(${ProfilePic});`' @click="goToProfile()"></div>
     <div class="user-info">
-      <h1 @click="goToProfile()">{{Username}}</h1>
+      <div class="comment-header">
+        <h1 @click="goToProfile()">{{Username}}</h1>
+        <p v-if="comment.poster == AppState.StateObj.Usr_UID" @click="deleteComment();">Löschen</p>
+      </div>
       <p>{{comment.comment}}</p>
     </div>
   </div>
@@ -11,10 +14,16 @@
 <script lang="ts">
 import {defineComponent} from 'vue'
 import {Config} from "@/config";
+import {AppState} from "@/state";
 
 export default defineComponent({
   name: "CommentInstance",
-  props: ['comment'],
+  computed: {
+    AppState() {
+      return AppState
+    }
+  },
+  props: ['comment', 'video'],
   data() {
     return {
       Username: "",
@@ -37,6 +46,15 @@ export default defineComponent({
             this.Username   = data['displayName'];
             this.ProfilePic = data['profilePicture'];
           })
+    },
+    deleteComment() {
+      fetch(`${Config.BackendHost}/comment/${this.video}/${this.comment.cid}`, {
+        method: 'DELETE',
+        credentials: "include"
+      })
+      .then(value => {
+          this.$emit("refresh");
+      })
     }
   },
   watch: {
@@ -48,10 +66,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.user-display {
-  display: flex;
-  flex-direction: row;
-  align-items: start;
+.comment-display {
+  display: grid;
+  grid-template-columns: auto 1fr;
 
   padding: 1em;
 
@@ -59,7 +76,7 @@ export default defineComponent({
   background: #2F2F2F;
 }
 
-.user-display .profile-pic {
+.comment-display .profile-pic {
   width: 3.5em;
   aspect-ratio: 1;
 
@@ -73,15 +90,35 @@ export default defineComponent({
   background-position: center;
 }
 
-.user-display h1 {
+.comment-display h1 {
   margin: 0;
   font-size: 1.3em;
 
   cursor: pointer;
 }
 
-.user-display p {
+.comment-display p {
   margin: 0;
   font-size: 1.3em;
+}
+
+.comment-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.comment-header p {
+  display: none;
+
+  cursor: pointer;
+
+  margin-left: auto;
+  color: #f15858;
+}
+
+.comment-display:hover .comment-header p {
+  display: initial;;
 }
 </style>

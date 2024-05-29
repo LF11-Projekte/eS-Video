@@ -1,10 +1,8 @@
 <template>
-  <div class="user-display" @click="goToProfile()">
+  <div class="user-tile" @click="goToProfile()">
     <div class="profile-pic" :style='`background-image: url(${ProfilePic});`'></div>
-    <div class="user-info">
-      <h1>{{Username}}</h1>
-      <p>{{Class}}</p>
-    </div>
+    <h1>{{Username}}</h1>
+    <p>{{Class}}</p>
   </div>
 </template>
 
@@ -13,7 +11,7 @@ import {defineComponent} from 'vue'
 import {Config} from "@/config";
 
 export default defineComponent({
-  name: "UserDisplay",
+  name: "UserTile",
   props: ['user'],
   data() {
     return {
@@ -23,7 +21,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.getUser();
+      this.getUser();
   },
   methods: {
     getUser() {
@@ -50,19 +48,33 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.user-display {
+.user-tile {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
 
+  padding: 1em;
+  width: 13em;
+
   cursor: pointer;
+  border-radius: 1em;
 
   color: white;
   background: #2F2F2F;
+
+  transition: background-color 0.2s;
 }
 
-.user-display .profile-pic {
-  width: 3.5em;
+.user-tile:hover {
+  background: #535353;
+}
+
+.user-tile:hover .profile-pic {
+  width: 8em;
+}
+
+.user-tile .profile-pic {
+  width: 7em;
   aspect-ratio: 1;
 
   margin: 1em;
@@ -72,14 +84,17 @@ export default defineComponent({
   background: white;
   background-size: cover;
   background-position: center;
+
+  transition: width 0.2s;
 }
 
-.user-display h1 {
+.user-tile h1 {
   margin: 0;
   font-size: 1.3em;
+  font-weight: bold !important;
 }
 
-.user-display p {
+.user-tile p {
   margin: 0;
   font-size: 1.3em;
 }

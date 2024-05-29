@@ -7,6 +7,8 @@ import EditProfileView from "@/views/EditProfileView.vue";
 import {AppState} from "@/state";
 import UploadView from "@/views/UploadView.vue";
 import VideoView from "@/views/VideoView.vue";
+import ClassView from "@/views/ClassView.vue";
+import SearchView from "@/views/SearchView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +46,14 @@ const router = createRouter({
     {
       path: '/video/:key',
       component: VideoView
+    },
+    {
+      path: '/class/:cid',
+      component: ClassView
+    },
+    {
+      path: '/search/:search',
+      component: SearchView
     }
   ]
 });
