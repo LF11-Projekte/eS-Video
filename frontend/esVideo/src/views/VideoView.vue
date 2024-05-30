@@ -44,7 +44,7 @@
         <div class="description">
           <h1>Über dieses Video</h1>
           <div class="control-center" v-if="Owner == AppState.StateObj.Usr_UID">
-            <p class="edit">Bearbeiten</p>
+<!--            <p class="edit">Bearbeiten</p>-->
             <p class="delete" @click="deleteVideo()">Löschen</p>
           </div>
           <div class="description-container">
@@ -214,7 +214,7 @@ export default defineComponent({
 
 .control-center {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1em;
 
   padding: 1em;
