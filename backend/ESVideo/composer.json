@@ -1,0 +1,9 @@
+{
+    "require": {
+        "slim/slim": "4.*",
+        "guzzlehttp/psr7": "^2",
+      "ext-http": "*",
+      "ext-curl": "*",
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
