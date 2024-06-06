@@ -14,10 +14,10 @@
           </div>
           <div class="follow-button">
               <button v-if="$route.params.uid != AppState.StateObj.Usr_UID" @click="doFollow()">
-              <transition name="fade" mode="out-in">
-                  <p v-if="IsFollowing">Entfolgen</p>
-                  <p v-else>Folgen</p>
-              </transition>
+                <transition name="fade" mode="out-in">
+                    <p v-if="IsFollowing">Entfolgen</p>
+                    <p v-else>Folgen</p>
+                </transition>
                 <p>{{Followers}}</p>
               </button>
               <div v-else>
